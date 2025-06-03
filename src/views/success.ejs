@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login with Google</title>
+    <title>Login Success</title>
     <style>
         body {
             display: flex;
@@ -16,19 +16,29 @@
         .container {
             text-align: center;
         }
-        h2 {
-            margin-bottom: 20px;
+        .input-group {
+            margin: 10px 0;
         }
-        button {
-            padding: 10px 20px;
-            cursor: pointer;
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 250px;
+        }
+        h2 {
+            color: green;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Login</h2>
-        <a href="/auth/google"><button>Login with Google</button></a>
+        <h2>Login Successful!</h2>
+        <div class="input-group">
+            <input type="text" value="<%= userData.name %>" readonly>
+        </div>
+        <div class="input-group">
+            <input type="email" value="<%= userData.email %>" readonly>
+        </div>
     </div>
 </body>
-</html>
+</html> 
