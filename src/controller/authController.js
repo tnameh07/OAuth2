@@ -12,26 +12,13 @@ export async function googleTOServer(req, res) {
     const redirectUri = `http://localhost:${process.env.PORT}/auth/google/callback`;
     console.log("code :", code)
     try {
-        const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
-            client_id: process.env.GOOGLE_CLIENT_ID,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET,
-            code,
-            redirect_uri: redirectUri,
-            grant_type: 'authorization_code',
-        });
-        console.log("tokenRes :", tokenRes.data)
-        const accessToken = tokenRes.data.access_token;
-
-        const profileRes = await axios.get(
-            'https://www.googleapis.com/oauth2/v2/userinfo',
-            {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            }
-        );
+        const tokenRes = await googleAuthorizationServer(code, redirectUri);
+        const accessToken = tokenRes?.data?.access_token;
+        const profileRes = await googleResourseServer(accessToken)
         console.log("profileRes :", profileRes.data)
         const userData = {
-            name: profileRes.data.name,
-            email: profileRes.data.email
+            name: profileRes?.data?.name,
+            email: profileRes?.data?.email
         };
 
         res.render('success', { userData });
@@ -41,8 +28,32 @@ export async function googleTOServer(req, res) {
     }
 }
 
+async function googleAuthorizationServer(authorization_code ,redirectUri) {
+   try{
+    const AuthTokens = await axios.post('https://oauth2.googleapis.com/token', {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        code:authorization_code,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+    })
+ return AuthTokens;
+   }catch(err){
+    throw new Error(err)
+   }
+}
 
+async function googleResourseServer(accessToken) {
+    
+    const userResource = await axios.get(
+        'https://www.googleapis.com/oauth2/v2/userinfo',
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        }
+    );
 
+    return userResource;
+}
 
 
 export async function redirectTOGitHub(req, res) {
@@ -88,10 +99,5 @@ export async function gitHubTOServer(req, res) {
         name: emailRes?.data?.name || 'unknown',
         email
     }
-    // console.log('GitHub user:', {
-    // 	name: userRes.data.name,
-    // 	email,
-    // });
-
     res.render('success', { userData });
 }

@@ -1,4 +1,17 @@
 
+// Google's OAuth 2.0 endpoint for requesting an access token
+var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+Sample OAuth 2.0 server response
+https://accounts.google.com/o/oauth2/v2/auth?
+ scope=https%3A//www.googleapis.com/auth/drive.metadata.readonly%20https%3A//www.googleapis.com/auth/calendar.readonly&
+ include_granted_scopes=true&
+ response_type=token&
+ state=state_parameter_passthrough_value&
+ redirect_uri=https%3A//oauth2.example.com/code&
+ client_id=client_id
+ 
+
 IMplimentaion of OAuth 2.0
 
 # ragistraion process
@@ -67,4 +80,43 @@ Not needed if you're doing only user OAuth.
 | `App ID` (optional)      | Used for JWT if going app-install route |
 
 
+Obtaining OAuth 2.0 access tokens
+The list below quickly summarizes these steps:
 
+Your application identifies the permissions it needs.
+Your application redirects the user to Google along with the list of requested permissions.
+The user decides whether to grant the permissions to your application.
+Your application finds out what the user decided.
+If the user granted the requested permissions, your application retrieves tokens needed to make API requests on the user's behalf.
+
+
+Step 1: Set authorization parameters
+https://developers.google.com/identity/protocols/oauth2/web-server#node.js
+| **Parameter**             | **Required**   | **Description**                                                        |
+| ------------------------- | -------------- | ---------------------------------------------------------------------- |
+| `client_id`               | ✅              | App's client ID from Cloud Console.                                    |
+| `redirect_uri`            | ✅              | Must match an authorized URI in Cloud Console exactly.                 |
+| `response_type`           | ✅              | Use `code` to get an authorization code.                               |
+| `scope`                   | ✅              | Space-separated list of requested permissions (e.g., `email profile`). |
+| `access_type`             | 🔁 Recommended | Set to `offline` to receive a refresh token.                           |
+| `state`                   | 🔐 Recommended | Custom string to prevent CSRF; helps validate request/response.        |
+| `include_granted_scopes`  | Optional       | Set to `true` for incremental scope requests.                          |
+| `enable_granular_consent` | Optional       | Enables detailed permission prompts (default `true`).                  |
+| `login_hint`              | Optional       | Prefills user email or ID to simplify login.                           |
+| `prompt`                  | Optional       | Force specific user prompts like `consent`, `select_account`, etc.     |
+
+
+Step 2: Redirect to Google's OAuth 2.0 server
+
+Step 3: Google prompts user for consent
+Step 4: Handle the OAuth 2.0 server response
+
+Sample OAuth 2.0 server response
+https://accounts.google.com/o/oauth2/v2/auth?
+ scope=https%3A//www.googleapis.com/auth/drive.metadata.readonly%20https%3A//www.googleapis.com/auth/calendar.readonly&
+ access_type=offline&
+ include_granted_scopes=true&
+ response_type=code&
+ state=state_parameter_passthrough_value&
+ redirect_uri=https%3A//oauth2.example.com/code&
+ client_id=client_id
